@@ -249,9 +249,16 @@
     const pitches = ng.querySelector('.pitches');
     if(!pitches) return;
     const allowed = new Set(TEAMS[chosenDiff]);
-    pitches.querySelectorAll('button').forEach(function(b, i){
+    const btns = pitches.querySelectorAll('button');
+    btns.forEach(function(b, i){
       b.classList.toggle('pitch-hidden', !allowed.has(i));
     });
+    // Clica no primeiro pitch visível para sincronizar o estado do React
+    // (caso a equipe padrão selecionada não esteja no tier desta dificuldade)
+    const firstAllowed = Array.from(btns).find(function(b){ return !b.classList.contains('pitch-hidden'); });
+    if(firstAllowed && !firstAllowed.classList.contains('on')){
+      firstAllowed.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+    }
   }
 
   function removePitchFilter(ng){
