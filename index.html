@@ -245,19 +245,43 @@
     });
   }
 
+  // Pega a prop onPick do React Fiber de um elemento DOM
+  function getReactOnPick(el){
+    const key = Object.keys(el).find(function(k){
+      return k.startsWith('__reactFiber') || k.startsWith('__reactInternalInstance');
+    });
+    if(!key) return null;
+    let fiber = el[key];
+    while(fiber){
+      const props = fiber.memoizedProps || fiber.pendingProps;
+      if(props && typeof props.onPick === 'function') return props.onPick;
+      fiber = fiber.return;
+    }
+    return null;
+  }
+
   function applyPitchFilter(ng){
     const pitches = ng.querySelector('.pitches');
     if(!pitches) return;
     const allowed = new Set(TEAMS[chosenDiff]);
     const btns = pitches.querySelectorAll('button');
+
+    // Esconde pitches fora do tier
     btns.forEach(function(b, i){
       b.classList.toggle('pitch-hidden', !allowed.has(i));
     });
-    // Clica no primeiro pitch visível para sincronizar o estado do React
-    // (caso a equipe padrão selecionada não esteja no tier desta dificuldade)
-    const firstAllowed = Array.from(btns).find(function(b){ return !b.classList.contains('pitch-hidden'); });
-    if(firstAllowed && !firstAllowed.classList.contains('on')){
-      firstAllowed.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+
+    // Chama onPick do primeiro pitch permitido via React Fiber
+    // para garantir que o estado do React seja atualizado
+    const firstBtn = Array.from(btns).find(function(b, i){ return allowed.has(i); });
+    if(firstBtn){
+      const onPick = getReactOnPick(firstBtn);
+      if(onPick){
+        onPick();
+      } else {
+        // fallback: dispara click real
+        firstBtn.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+      }
     }
   }
 
