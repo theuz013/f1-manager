@@ -506,6 +506,8 @@ function __fastSim(st0,n){let e=st0;const b=Ye(e);if(b)return b;if(e.stage!=="pr
     if(e.event){const k=fe(e.seed^(e.season*7919+e.gpIndex*913)).int(0,e.event.options.length-1),r=Lh(e,k);e=r.ok?r.state:{...e,event:null}}
     for(const a of ae)if(q(e).car[a].wear>=80){const r=Qh(e,a);if(r.ok)e=r.state}
     if(e.stage!=="preparacao")break;
+    {const tr=Pe(e),rr=fe(e.seed^(e.season*131+e.gpIndex*17));let sp={...(e.setups||{})};for(const id of me.driverIds){const ide=Tp(tr,U(e,id)),o={};for(const k of cn)o[k]=ee(Math.round(ide[k]+rr.int(-8,8)),0,100);sp[id]=o}e={...e,setups:sp,plan:null};
+     const so0=e.sponsors.length;e=Ux(e,{sponsors:Yn,research:!0,manufacture:!0});}
     const gp=Pe(e).gp;e=sd(e);if(e.stage==="corrida")e=Ql(od(e),"");
     const h=e.history[e.history.length-1];
     if(h){const pos=me.driverIds.map(id=>{const i=h.finishOrder.indexOf(id);return`${we(U(e,id).name)} ${i>=0&&!(h.dnf&&h.dnf[id])?"P"+(i+1):"abandonou"}`});lines.push(`${gp}: ${pos.join(" · ")}`)}
@@ -520,11 +522,11 @@ function __FastBtn({state:e,act}){const[open,setOpen]=D.useState(false),left=e.t
   const go=n=>{act(A=>__fastSim(A,n));setOpen(false)};
   return s.jsxs("div",{style:{marginTop:10,padding:12,border:"1px solid var(--warn)",borderRadius:12,display:"grid",gap:8},children:[
     s.jsx("b",{children:"⏩ Acelerar a temporada"}),
-    s.jsx("p",{className:"small",style:{margin:0},children:"O jogo simula os próximos GPs sem a sua participação. É mais rápido, mas a equipe corre no automático e algumas decisões que poderiam te favorecer deixam de acontecer."}),
+    s.jsx("p",{className:"small",style:{margin:0},children:"O jogo simula os próximos GPs com a equipe técnica no comando. O resultado tende a ser um pouco abaixo do que você conseguiria jogando, porque os detalhes finos ficam de fora. A diretoria avalia normalmente."}),
     s.jsx("div",{className:"small",children:s.jsx("b",{children:"O que o jogo faz por você"})}),
-    s.jsx("ul",{className:"small",style:{margin:0,paddingLeft:18},children:["Simula treino, classificação e corrida com o acerto que estiver salvo para cada piloto e estratégia padrão.","Troca peças com desgaste acima de 80% para evitar quebras (paga o custo normal).","Salários, manutenção e patrocínios já fechados seguem normalmente."].map(li)}),
+    s.jsx("ul",{className:"small",style:{margin:0,paddingLeft:18},children:["O engenheiro faz o treino: o acerto fica bom, perto de 80–90% do ideal.","Usa a estratégia recomendada pelo engenheiro.","Aceita os patrocínios e ações de ocasião oferecidos.","Toca o P&D: troca peças gastas, abre projetos de desempenho e fabrica as peças novas.","Salários e manutenção seguem normalmente."].map(li)}),
     s.jsx("div",{className:"small",children:s.jsx("b",{className:"loss",children:"O que você perde"})}),
-    s.jsx("ul",{className:"small",style:{margin:0,paddingLeft:18},children:["Sem treino: o acerto não melhora com o feedback dos pilotos.","Sem ordens de equipe nem mudança de estratégia durante a corrida.","Eventos respondidos automaticamente, sem garantia da melhor escolha.","Nenhum patrocínio novo nem ação de ocasião é aceito.","Não inicia P&D, não fabrica peças, não negocia pilotos ou profissionais e não renova contratos.","A diretoria avalia os resultados normalmente: você pode ser demitido no meio da simulação."].map(li)}),
+    s.jsx("ul",{className:"small",style:{margin:0,paddingLeft:18},children:["O acerto perfeito que você poderia achar no treino.","Ordens de equipe e mudanças de estratégia durante a corrida.","Eventos respondidos pelo assessor: nem sempre a melhor escolha.","Escolher você mesmo onde investir no P&D (o engenheiro decide sozinho).","Negociações de pilotos e funcionários e renovações ficam para quando você voltar."].map(li)}),
     s.jsxs("div",{className:"row",style:{gap:6,flexWrap:"wrap"},children:[s.jsx("button",{onClick:()=>go(1),children:"Só o próximo GP"}),left>3&&s.jsx("button",{onClick:()=>go(3),children:"Próximos 3 GPs"}),s.jsx("button",{className:"primary",onClick:()=>go(left),children:`Até o fim (${left} GP${left>1?"s":""})`}),s.jsx("button",{className:"ghost",onClick:()=>setOpen(false),children:"Cancelar"})]})]})}
 
 function __secInit(st){if(!st||!st.drivers||st.__sec0)return st;const all=[...st.drivers,...(st.freeAgents||[])],has=new Map(all.filter(d=>d.sec).map(d=>[d.id,d.sec])),give=(list,k,n)=>{for(const d of list){if(n<=0)break;if(has.has(d.id))continue;has.set(d.id,k);n--}};const byT=[...all].sort((a,b)=>b.talento-a.talento);
