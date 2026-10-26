@@ -127,6 +127,143 @@
 })();
 </script>
 <div id="root"></div>
+
+<!-- F1 Manager Difficulty Selector -->
+<style>
+.diff-overlay{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;animation:view-in .3s var(--ease,cubic-bezier(.2,.8,.2,1))}
+.diff-box{width:100%;max-width:480px;display:grid;gap:20px;text-align:center}
+.diff-title{font-family:"Barlow Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:800;font-style:italic;font-size:clamp(2rem,8vw,3rem);letter-spacing:.04em;line-height:1}
+.diff-title span{color:#00d26a}
+.diff-sub{color:#b0bfc9;margin:0;font-size:.95rem}
+.diff-strip{height:8px;border-radius:2px;margin:4px auto 0;width:100px;opacity:.7;background:repeating-conic-gradient(#f2f6f8 0,#f2f6f8 25%,#0b1115 0,#0b1115 50%) 0 0 / 8px 8px}
+.diff-grid{display:grid;gap:10px}
+.diff-btn{width:100%;display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#111a20;border:1px solid #273640;color:#f2f6f8;font:inherit;cursor:pointer;text-align:left;transition:border-color .15s,background-color .15s,transform .15s cubic-bezier(.2,.8,.2,1)}
+.diff-btn:hover{border-color:#b0bfc9;background:#18232b;transform:translateY(-2px)}
+.diff-btn:active{transform:translateY(0)}
+.diff-icon{font-size:1.8rem;line-height:1;width:56px;text-align:center}
+.diff-label{display:grid;gap:2px}
+.diff-label b{font-family:"Barlow Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:.05em;text-transform:uppercase}
+.diff-label span{font-size:.82rem;color:#b0bfc9;line-height:1.3}
+.diff-tier{font-family:"Barlow Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.diff-btn.facil .diff-tier{color:#00d26a}
+.diff-btn.facil:hover{border-color:#00d26a}
+.diff-btn.medio .diff-tier{color:#8fd3ff}
+.diff-btn.medio:hover{border-color:#8fd3ff}
+.diff-btn.dificil .diff-tier{color:#f2c94c}
+.diff-btn.dificil:hover{border-color:#f2c94c}
+.diff-btn.muito-dificil .diff-tier{color:#ff8a80}
+.diff-btn.muito-dificil:hover{border-color:#ff8a80}
+</style>
+<script>
+(function(){
+  'use strict';
+
+  // Team tiers — index matches zc array order (bot0..bot9)
+  // 0:Vermelha Corse t8, 1:Prata Motorsport t8, 2:Taurus t7, 3:Laranja t7,
+  // 4:Verde Britânia t6, 5:Alpino t5, 6:Falcão t5, 7:Ondina t4, 8:Tucano t3, 9:Brasa t4
+  const DIFFICULTY_TEAMS = {
+    facil:       ['bot0','bot1'],           // tier 8 — top
+    medio:       ['bot2','bot3','bot4'],     // tier 6–7 — meio
+    dificil:     ['bot5','bot6','bot9'],     // tier 4–5 — fraco
+    'muito-dificil': ['bot7','bot8']        // tier 3–4 — pior
+  };
+
+  const LABELS = {
+    facil:           { icon:'🟢', label:'Fácil',        sub:'Você começa numa das melhores equipes do grid.',        tier:'Top 1–2' },
+    medio:           { icon:'🔵', label:'Médio',         sub:'Uma equipe de meio de tabela com potencial.',           tier:'Meio de tabela' },
+    dificil:         { icon:'🟡', label:'Difícil',       sub:'Equipe fraca. Vai precisar batalhar muito.',            tier:'Equipe fraca' },
+    'muito-dificil': { icon:'🔴', label:'Muito Difícil', sub:'A pior equipe do grid. Boa sorte.',                    tier:'Lanterna' }
+  };
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function injectDifficultyScreen(){
+    // Wait for .newgame.wide to appear (new game screen)
+    const target = document.querySelector('.newgame.wide');
+    if(!target) return;
+
+    // Already injected?
+    if(target.querySelector('.diff-overlay')) return;
+
+    // Build overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'diff-overlay';
+
+    const box = document.createElement('div');
+    box.className = 'diff-box';
+
+    box.innerHTML = `
+      <div>
+        <div class="diff-strip"></div>
+        <div class="diff-title">Escolha a<br><span>Dificuldade</span></div>
+        <p class="diff-sub">Isso determina em qual equipe você vai começar sua carreira.</p>
+      </div>
+      <div class="diff-grid">
+        ${['facil','medio','dificil','muito-dificil'].map(d=>{
+          const l = LABELS[d];
+          return `<button class="diff-btn ${d}" data-diff="${d}">
+            <div class="diff-icon">${l.icon}</div>
+            <div class="diff-label"><b>${l.label}</b><span>${l.sub}</span></div>
+            <div class="diff-tier">${l.tier}</div>
+          </button>`;
+        }).join('')}
+      </div>
+    `;
+
+    overlay.appendChild(box);
+
+    // Insert overlay inside .newgame.wide
+    target.style.position = 'relative';
+    target.insertBefore(overlay, target.firstChild);
+
+    // Handle difficulty click
+    overlay.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-diff]');
+      if(!btn) return;
+
+      const diff = btn.dataset.diff;
+      const teamId = pickRandom(DIFFICULTY_TEAMS[diff]);
+
+      // Find the correct pitch button and click it
+      const pitches = target.querySelector('.pitches');
+      if(pitches){
+        const allPitchBtns = pitches.querySelectorAll('button.pitch, button[class*="pitch"]');
+        // Teams are rendered in zc order (bot0..bot9), find the one matching teamId
+        const teamIndex = parseInt(teamId.replace('bot',''));
+        let clicked = false;
+        // Try matching by team index order in the grid
+        if(allPitchBtns[teamIndex]){
+          allPitchBtns[teamIndex].click();
+          clicked = true;
+        }
+        if(!clicked){
+          // fallback: click first pitch
+          if(allPitchBtns[0]) allPitchBtns[0].click();
+        }
+      }
+
+      // Remove overlay with fade
+      overlay.style.transition = 'opacity .25s';
+      overlay.style.opacity = '0';
+      setTimeout(()=>overlay.remove(), 260);
+    });
+  }
+
+  // Watch for the newgame screen appearing
+  const observer = new MutationObserver(function(){
+    if(document.querySelector('.newgame.wide')){
+      // Small delay so React has finished rendering pitches
+      setTimeout(injectDifficultyScreen, 80);
+    }
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
+
+  // Also try immediately in case already rendered
+  setTimeout(injectDifficultyScreen, 200);
+})();
+</script>
+
 <script type="module">(function(){const n=document.createElement("link").relList;if(n&&n.supports&&n.supports("modulepreload"))return;for(const a of document.querySelectorAll('link[rel="modulepreload"]'))t(a);new MutationObserver(a=>{for(const o of a)if(o.type==="childList")for(const i of o.addedNodes)i.tagName==="LINK"&&i.rel==="modulepreload"&&t(i)}).observe(document,{childList:!0,subtree:!0});function r(a){const o={};return a.integrity&&(o.integrity=a.integrity),a.referrerPolicy&&(o.referrerPolicy=a.referrerPolicy),a.crossOrigin==="use-credentials"?o.credentials="include":a.crossOrigin==="anonymous"?o.credentials="omit":o.credentials="same-origin",o}function t(a){if(a.ep)return;a.ep=!0;const o=r(a);fetch(a.href,o)}})();var dm={exports:{}},ho={},um={exports:{}},ne={};/**
  * @license React
  * react.production.min.js
