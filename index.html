@@ -130,8 +130,17 @@
 
 <!-- F1 Manager Difficulty Selector -->
 <style>
-#diff-overlay{position:fixed;inset:0;z-index:9999;background:#0b1115;display:flex;align-items:center;justify-content:center;padding:24px 16px;pointer-events:all}
+/* Overlay cobre a tela de equipes enquanto jogador escolhe dificuldade */
+#diff-overlay{position:fixed;inset:0;z-index:9999;background:#0b1115;display:flex;align-items:center;justify-content:center;padding:24px 16px}
 #diff-overlay.hidden{display:none}
+/* Badge de dificuldade ativa visível sobre a grade de equipes */
+#diff-badge{position:fixed;top:0;left:0;right:0;z-index:9998;background:#111a20;border-bottom:2px solid #273640;padding:10px 20px;display:flex;align-items:center;gap:12px;font-family:Barlow,Inter,system-ui,sans-serif}
+#diff-badge.hidden{display:none}
+#diff-badge span{font-family:"Barlow Condensed","Roboto Condensed",system-ui,sans-serif;font-weight:800;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;color:#f2f6f8}
+#diff-badge small{color:#b0bfc9;font-size:.82rem}
+#diff-badge button{margin-left:auto;padding:5px 12px;font-size:.82rem;font-family:Barlow,Inter,system-ui,sans-serif;background:transparent;border:1px solid #273640;border-radius:8px;color:#b0bfc9;cursor:pointer}
+#diff-badge button:hover{border-color:#b0bfc9;color:#f2f6f8}
+/* Estilos do seletor */
 .diff-box{width:100%;max-width:460px;display:grid;gap:22px;text-align:center}
 .diff-title{font-family:"Barlow Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:800;font-style:italic;font-size:clamp(2.2rem,8vw,3rem);letter-spacing:.04em;line-height:1.05;color:#f2f6f8}
 .diff-title span{color:#00d26a}
@@ -146,111 +155,138 @@
 .diff-label b{font-family:"Barlow Condensed","Roboto Condensed","Arial Narrow",system-ui,sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:.05em;text-transform:uppercase}
 .diff-label span{font-size:.8rem;color:#b0bfc9;line-height:1.3}
 .diff-tier{font-family:"Barlow Condensed","Roboto Condensed",system-ui,sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;flex-shrink:0}
-.diff-btn[data-diff="facil"]:hover{border-color:#00d26a}
-.diff-btn[data-diff="facil"] .diff-tier{color:#00d26a}
-.diff-btn[data-diff="medio"]:hover{border-color:#8fd3ff}
-.diff-btn[data-diff="medio"] .diff-tier{color:#8fd3ff}
-.diff-btn[data-diff="dificil"]:hover{border-color:#f2c94c}
-.diff-btn[data-diff="dificil"] .diff-tier{color:#f2c94c}
-.diff-btn[data-diff="muito-dificil"]:hover{border-color:#ff8a80}
-.diff-btn[data-diff="muito-dificil"] .diff-tier{color:#ff8a80}
+.diff-btn[data-diff="facil"]:hover{border-color:#00d26a}.diff-btn[data-diff="facil"] .diff-tier{color:#00d26a}
+.diff-btn[data-diff="medio"]:hover{border-color:#8fd3ff}.diff-btn[data-diff="medio"] .diff-tier{color:#8fd3ff}
+.diff-btn[data-diff="dificil"]:hover{border-color:#f2c94c}.diff-btn[data-diff="dificil"] .diff-tier{color:#f2c94c}
+.diff-btn[data-diff="muito-dificil"]:hover{border-color:#ff8a80}.diff-btn[data-diff="muito-dificil"] .diff-tier{color:#ff8a80}
+/* Esconde pitches que não pertencem à dificuldade selecionada */
+.pitches button.pitch-hidden{display:none!important}
 </style>
+
 <div id="diff-overlay" class="hidden">
   <div class="diff-box">
     <div>
       <div class="diff-strip"></div>
       <div class="diff-title">Escolha a<br><span>Dificuldade</span></div>
-      <p class="diff-sub">Isso determina em qual equipe você vai começar sua carreira.</p>
+      <p class="diff-sub">Isso determina quais equipes estarão disponíveis.</p>
     </div>
     <div class="diff-grid">
-      <button class="diff-btn" data-diff="facil"><div class="diff-icon">🟢</div><div class="diff-label"><b>Fácil</b><span>Você começa numa das melhores equipes do grid.</span></div><div class="diff-tier">Top 1–2</div></button>
-      <button class="diff-btn" data-diff="medio"><div class="diff-icon">🔵</div><div class="diff-label"><b>Médio</b><span>Uma equipe de meio de tabela com potencial.</span></div><div class="diff-tier">Meio de tabela</div></button>
-      <button class="diff-btn" data-diff="dificil"><div class="diff-icon">🟡</div><div class="diff-label"><b>Difícil</b><span>Equipe fraca. Vai precisar batalhar muito.</span></div><div class="diff-tier">Equipe fraca</div></button>
-      <button class="diff-btn" data-diff="muito-dificil"><div class="diff-icon">🔴</div><div class="diff-label"><b>Muito Difícil</b><span>A pior equipe do grid. Boa sorte.</span></div><div class="diff-tier">Lanterna</div></button>
+      <button class="diff-btn" data-diff="facil"><div class="diff-icon">🟢</div><div class="diff-label"><b>Fácil</b><span>As 2 melhores equipes do grid.</span></div><div class="diff-tier">Top 1–2</div></button>
+      <button class="diff-btn" data-diff="medio"><div class="diff-icon">🔵</div><div class="diff-label"><b>Médio</b><span>Equipes de meio de tabela.</span></div><div class="diff-tier">Meio de tabela</div></button>
+      <button class="diff-btn" data-diff="dificil"><div class="diff-icon">🟡</div><div class="diff-label"><b>Difícil</b><span>Equipes fracas. Vai precisar batalhar.</span></div><div class="diff-tier">Equipe fraca</div></button>
+      <button class="diff-btn" data-diff="muito-dificil"><div class="diff-icon">🔴</div><div class="diff-label"><b>Muito Difícil</b><span>As piores equipes do grid. Boa sorte.</span></div><div class="diff-tier">Lanterna</div></button>
     </div>
   </div>
 </div>
+
+<div id="diff-badge" class="hidden">
+  <span id="diff-badge-icon"></span>
+  <span id="diff-badge-label"></span>
+  <small id="diff-badge-sub"></small>
+  <button id="diff-badge-back">← Mudar dificuldade</button>
+</div>
+
 <script>
 (function(){
   'use strict';
 
-  // Teams by difficulty — index = position in zc array = bot{N}
+  // Índices na ordem do array zc (bot0..bot9):
   // 0:Vermelha Corse t8, 1:Prata Motorsport t8, 2:Taurus t7, 3:Laranja t7,
   // 4:Verde Britânia t6, 5:Alpino t5, 6:Falcão t5, 7:Ondina t4, 8:Tucano t3, 9:Brasa t4
   const TEAMS = {
-    'facil':       [0,1],       // tier 8
-    'medio':       [2,3,4],     // tier 6-7
-    'dificil':     [5,6,9],     // tier 4-5
-    'muito-dificil': [7,8]      // tier 3-4
+    'facil':         [0,1],
+    'medio':         [2,3,4],
+    'dificil':       [5,6,9],
+    'muito-dificil': [7,8]
+  };
+  const LABELS = {
+    'facil':         {icon:'🟢', label:'Fácil',        sub:'Top 1–2'},
+    'medio':         {icon:'🔵', label:'Médio',         sub:'Meio de tabela'},
+    'dificil':       {icon:'🟡', label:'Difícil',       sub:'Equipe fraca'},
+    'muito-dificil': {icon:'🔴', label:'Muito Difícil', sub:'Lanterna'}
   };
 
-  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  const overlay  = document.getElementById('diff-overlay');
+  const badge    = document.getElementById('diff-badge');
+  const badgeIcon  = document.getElementById('diff-badge-icon');
+  const badgeLabel = document.getElementById('diff-badge-label');
+  const badgeSub   = document.getElementById('diff-badge-sub');
+  const badgeBack  = document.getElementById('diff-badge-back');
 
-  const overlay = document.getElementById('diff-overlay');
-
-  // Show overlay when new game screen appears
-  // 'locked' prevents re-showing while we process a choice
   let watching = false;
-  let locked = false;
+  let chosenDiff = null;
 
-  function checkNewGame(){
-    if(locked) return;
-    const ng = document.querySelector('.newgame.wide');
-    if(ng && !watching){
-      watching = true;
-      overlay.classList.remove('hidden');
-    } else if(!ng && watching){
-      watching = false;
-      overlay.classList.add('hidden');
-    }
+  // Esconde pitches que não são da dificuldade escolhida
+  function applyFilter(){
+    const pitches = document.querySelector('.pitches');
+    if(!pitches) return;
+    const btns = pitches.querySelectorAll('button');
+    const allowed = chosenDiff ? new Set(TEAMS[chosenDiff]) : null;
+    btns.forEach(function(btn, i){
+      if(allowed && !allowed.has(i)){
+        btn.classList.add('pitch-hidden');
+      } else {
+        btn.classList.remove('pitch-hidden');
+      }
+    });
   }
 
-  // Fire a React-compatible synthetic click via nativeEvent dispatch
-  function reactClick(el){
-    // Dispatch a real MouseEvent so React's synthetic event system picks it up
-    el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  // Quando a tela de novo jogo aparece
+  function onNewGameAppear(){
+    if(watching) return;
+    watching = true;
+    chosenDiff = null;
+    // Esconde a tela de equipes e mostra o seletor de dificuldade
+    overlay.classList.remove('hidden');
+    badge.classList.add('hidden');
   }
 
-  // Handle difficulty selection
+  // Quando a tela de novo jogo some
+  function onNewGameGone(){
+    watching = false;
+    chosenDiff = null;
+    overlay.classList.add('hidden');
+    badge.classList.add('hidden');
+  }
+
+  // Clique numa dificuldade
   overlay.addEventListener('click', function(e){
     const btn = e.target.closest('[data-diff]');
     if(!btn) return;
+    chosenDiff = btn.dataset.diff;
+    const l = LABELS[chosenDiff];
 
-    const diff = btn.dataset.diff;
-    const idx = pickRandom(TEAMS[diff]);
-
-    // Lock and hide overlay so observer doesn't re-show it
-    locked = true;
-    watching = false;
+    // Mostra badge e esconde overlay
     overlay.classList.add('hidden');
+    badgeIcon.textContent  = l.icon + ' ';
+    badgeLabel.textContent = l.label;
+    badgeSub.textContent   = '· ' + l.sub + ' — Escolha sua equipe abaixo';
+    badge.classList.remove('hidden');
 
-    // Step 1: click the pitch button at the correct index
-    setTimeout(function(){
-      const pitches = document.querySelector('.pitches');
-      if(!pitches) return;
-
-      const pitchBtns = pitches.querySelectorAll('button');
-      const target = pitchBtns[idx];
-      if(!target) return;
-
-      reactClick(target);
-
-      // Step 2: after React updates state (~200ms), click the start button
-      setTimeout(function(){
-        const startBtn = document.querySelector('button.primary.start');
-        if(startBtn && !startBtn.disabled){
-          reactClick(startBtn);
-        }
-        // Unlock after game starts (newgame.wide will disappear)
-        setTimeout(function(){ locked = false; }, 500);
-      }, 200);
-    }, 80);
+    // Filtra os pitches
+    setTimeout(applyFilter, 50);
   });
 
-  // MutationObserver to detect screen changes
-  new MutationObserver(checkNewGame).observe(document.body, {childList:true, subtree:true});
-  // Initial check
-  setTimeout(checkNewGame, 300);
+  // Botão "← Mudar dificuldade"
+  badgeBack.addEventListener('click', function(){
+    chosenDiff = null;
+    badge.classList.add('hidden');
+    overlay.classList.remove('hidden');
+    // Remove filtro
+    const pitches = document.querySelector('.pitches');
+    if(pitches) pitches.querySelectorAll('button').forEach(function(b){ b.classList.remove('pitch-hidden'); });
+  });
+
+  // Observer
+  new MutationObserver(function(){
+    const ng = document.querySelector('.newgame.wide');
+    if(ng && !watching) onNewGameAppear();
+    else if(!ng && watching) onNewGameGone();
+  }).observe(document.body, {childList:true, subtree:true});
+
+  setTimeout(function(){
+    if(document.querySelector('.newgame.wide')) onNewGameAppear();
+  }, 300);
 })();
 </script>
 
