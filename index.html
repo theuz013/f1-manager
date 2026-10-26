@@ -245,44 +245,56 @@
     });
   }
 
-  // Pega a prop onPick do React Fiber de um elemento DOM
-  function getReactOnPick(el){
+  // Chama o onClick do React Fiber de um elemento DOM
+  function callReactClick(el){
     const key = Object.keys(el).find(function(k){
       return k.startsWith('__reactFiber') || k.startsWith('__reactInternalInstance');
     });
-    if(!key) return null;
+    if(!key) return false;
     let fiber = el[key];
     while(fiber){
       const props = fiber.memoizedProps || fiber.pendingProps;
-      if(props && typeof props.onPick === 'function') return props.onPick;
+      if(props && typeof props.onClick === 'function'){
+        props.onClick({type:'click',preventDefault:function(){},stopPropagation:function(){}});
+        return true;
+      }
       fiber = fiber.return;
     }
-    return null;
+    return false;
   }
 
   function applyPitchFilter(ng){
     const pitches = ng.querySelector('.pitches');
     if(!pitches) return;
     const allowed = new Set(TEAMS[chosenDiff]);
-    const btns = pitches.querySelectorAll('button');
+    const btns = Array.from(pitches.querySelectorAll('button'));
 
-    // Esconde pitches fora do tier
-    btns.forEach(function(b, i){
-      b.classList.toggle('pitch-hidden', !allowed.has(i));
-    });
+    // Encontra o índice correto e o botão permitido
+    var firstBtn = null;
+    var firstIdx = -1;
+    for(var i = 0; i < btns.length; i++){
+      if(allowed.has(i)){
+        firstBtn = btns[i];
+        firstIdx = i;
+        break;
+      }
+    }
 
-    // Chama onPick do primeiro pitch permitido via React Fiber
-    // para garantir que o estado do React seja atualizado
-    const firstBtn = Array.from(btns).find(function(b, i){ return allowed.has(i); });
+    // Sincroniza o estado do React clicando no primeiro botão permitido
+    // ANTES de esconder os outros (enquanto todos ainda estão visíveis)
     if(firstBtn){
-      const onPick = getReactOnPick(firstBtn);
-      if(onPick){
-        onPick();
-      } else {
-        // fallback: dispara click real
+      var clicked = callReactClick(firstBtn);
+      if(!clicked){
         firstBtn.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
       }
     }
+
+    // Esconde pitches fora do tier após sincronizar o estado
+    setTimeout(function(){
+      btns.forEach(function(b, i){
+        b.classList.toggle('pitch-hidden', !allowed.has(i));
+      });
+    }, 30);
   }
 
   function removePitchFilter(ng){
