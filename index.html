@@ -548,28 +548,31 @@ function __sUpd(e,loc,np){if(loc.where==='mine')return{...e,staff:e.staff.map(x=
 function __sOffer(st0,pid,sal,anos){
   let e=__stNorm(st0);const b=Ye(e);if(b)return b;const me=q(e);
   const loc=__sFind(e,pid);if(!loc)return F('Esse profissional não está mais disponível.');const p=loc.p;
-  if(p.recusou===e.season)return F(`${p.name} já recusou uma proposta sua nesta temporada.`);
-  const o={sal:Ke(sal),anos},ev=__sEval(e,p,o);
-  if(!ev.ok){const why=!ev.ex.ok?`exigência não atendida (${ev.ex.txt.toLowerCase()})`:ev.from?`preferiu continuar na ${ev.from.name}`:loc.where==='mine'?'achou o aumento pequeno':'achou a proposta baixa';
-    e=__sUpd(e,loc,{...p,recusou:e.season});
-    if(loc.where==='mine')e=rn(e,`${p.name} recusou a renovação: ${why}. Se o contrato acabar, ele deixa a equipe.`);
-    return ie(e,`${p.name} recusou: ${why}. Não negocia de novo nesta temporada.`)}
+  if(p.recusou===e.season)return F(`${p.name} encerrou as negociações com você nesta temporada.`);
+  const o={sal:Ke(sal),anos},ev=__sEval(e,p,o),tries=p.tS===e.season?p.tN:3;let okk=ev.ok,meio=false;
+  if(!okk&&ev.ex.ok&&ev.sc>=44&&fe(Un(p.id)^e.season*31^tries*7).chance(.35)){okk=true;meio=true}
+  if(!okk){const why=!ev.ex.ok?`exigência não atendida (${ev.ex.txt.toLowerCase()})`:ev.from?`preferiu continuar na ${ev.from.name}`:loc.where==='mine'?'achou o aumento pequeno':'achou a proposta baixa',left=tries-1;
+    let np={...p,tS:e.season,tN:left,contra:undefined},msg;
+    if(left<=0){np.recusou=e.season;msg=`${p.name} recusou: ${why}. Sem mais tentativas: ele encerrou as negociações nesta temporada.`;if(loc.where==='mine')e=rn(e,`${p.name} recusou a renovação de vez. Se o contrato acabar, ele deixa a equipe.`)}
+    else{msg=`${p.name} recusou: ${why}. Restam ${left} tentativa${left>1?"s":""}.`;
+      if(ev.ex.ok&&ev.sc>=34){const need=Ke(o.sal+(50-ev.sc)/150*ev.ask+.01);np.contra={s:e.season,sal:need,anos};msg+=` Contraproposta dele: ${J(need)}/GP.`}}
+    e=__sUpd(e,loc,np);return ie(e,msg)}
   const c=__sCost(e,p,o);
   if(loc.where==='mine'){const r=jn(e,'contratacao',c.luvas,`Renovação de ${p.name}`);if(!r.ok)return r;e=r.state;const ate=e.season+anos;
-    e={...e,staff:e.staff.map(x=>x.id===p.id?{...x,salario:o.sal,contratoAte:ate,recusou:undefined}:x)};return ie(e,`${p.name} renovou até a temporada ${ate}.`)}
+    e={...e,staff:e.staff.map(x=>x.id===p.id?{...x,salario:o.sal,contratoAte:ate,recusou:undefined,tS:undefined,tN:undefined,contra:undefined}:x)};return ie(e,`${meio?"Meio-termo aceito! ":""}${p.name} renovou até a temporada ${ate}.`)}
   if(c.total>qe(e)+1e-9)return F(`Saldo insuficiente: a operação custa ${J(c.total)} e o caixa tem ${J(qe(e))}.`);
   let r=jn(e,'contratacao',c.luvas,`Luvas de ${p.name} (${ir[p.role].name})`);if(!r.ok)return r;e=r.state;
   if(c.buy){r=jn(e,'rescisao',c.buy,`Multa rescisória paga à ${c.from.name}`);if(!r.ok)return r;e=r.state}
   if(c.mult){r=jn(e,'rescisao',c.mult,`Dispensa de ${c.cur.name}`);if(!r.ok)return r;e=r.state}
-  const np={...p,teamId:me.id,salario:o.sal,contratoAte:e.season+anos-1,recusou:undefined};
+  const np={...p,teamId:me.id,salario:o.sal,contratoAte:e.season+anos-1,recusou:undefined,tS:undefined,tN:undefined,contra:undefined};
   let market=e.staffMarket.filter(x=>x.id!==p.id);if(c.cur&&!__isInt(c.cur))market=[...market,{...c.cur,teamId:'',contratoAte:e.season}];
   let teams=e.teams;
   if(loc.where==='team'){teams=teams.map(t=>{if(t.id!==loc.tid)return t;const cand=market.filter(x=>x.role===p.role).sort((a,b2)=>b2.habilidade-a.habilidade)[0];let rep;
     if(cand&&cand.habilidade>=p.habilidade-25){market=market.filter(x=>x.id!==cand.id);rep={...cand,teamId:t.id,contratoAte:e.season+1}}else rep=__interino(e,t.id,p.role,'rep');
     return{...t,staff:t.staff.map(x=>x.id===p.id?rep:x)}})}
   e={...e,staff:e.staff.map(x=>x.role===p.role?np:x),staffMarket:market,teams};
-  if(loc.where==='team'){e=_c(e,ts(e,'paddock',[`🧑‍🔧 ${me.name} tirou ${p.name} (${ir[p.role].name.toLowerCase()}) da ${c.from.name}.`]));return ie(e,`${p.name} trocou a ${c.from.name} pela ${me.name}.`)}
-  return ie(e,`${p.name} é o novo ${ir[p.role].name.toLowerCase()}.`)}
+  if(loc.where==='team'){e=_c(e,ts(e,'paddock',[`🧑‍🔧 ${me.name} tirou ${p.name} (${ir[p.role].name.toLowerCase()}) da ${c.from.name}.`]));return ie(e,`${meio?"Meio-termo aceito! ":""}${p.name} trocou a ${c.from.name} pela ${me.name}.`)}
+  return ie(e,`${meio?"Meio-termo aceito! ":""}${p.name} é o novo ${ir[p.role].name.toLowerCase()}.`)}
 function __staffSeason(st0){
   let st=__stNorm(st0);if(!st||!st.staff||!st.teams)return st;
   const S=st.season,r=fe(st.seed^S*7349),me=q(st),news=[],inbox=[];
@@ -612,8 +615,8 @@ function __staffSeason(st0){
 function __rcrew(o,i){const c=o.staff&&o.staff.find(x=>x.role==='chefeBox');return c?c.habilidade:30+i*6}
 function __StaffPanel({state:e0,act}){
   const e=__stNorm(e0),me=q(e);
-  const[tab,setTab]=D.useState('outras'),[role,setRole]=D.useState('diretorTecnico'),[lim,setLim]=D.useState(8),[open,setOpen]=D.useState(null),[mul,setMul]=D.useState(1),[anos,setAnos]=D.useState(2);
-  let rows=tab==='minha'?e.staff:tab==='mercado'?e.staffMarket:e.teams.filter(t=>t.id!==me.id&&t.staff).flatMap(t=>t.staff.filter(p=>!__isInt(p)));
+  const[tab,setTab]=D.useState('outras'),rivals=e.teams.filter(t=>t.id!==me.id&&t.staff).sort((a,b)=>yr(b)-yr(a)),[tf0,setTf]=D.useState(''),tf=tf0||(rivals[0]&&rivals[0].id),[role,setRole]=D.useState('todos'),[lim,setLim]=D.useState(8),[open,setOpen]=D.useState(null),[mul,setMul]=D.useState(1),[anos,setAnos]=D.useState(2);
+  let rows=tab==='minha'?e.staff:tab==='mercado'?e.staffMarket:rivals.filter(t=>tf==='todas'||t.id===tf).flatMap(t=>t.staff.filter(p=>!__isInt(p)));
   if(role!=='todos')rows=rows.filter(p=>p.role===role);
   rows=[...rows].sort((a,b)=>tab==='minha'?so.indexOf(a.role)-so.indexOf(b.role):b.habilidade-a.habilidade);
   const tn=id=>(e.teams.find(t=>t.id===id)||{}).name||'Livre';
@@ -627,7 +630,7 @@ function __StaffPanel({state:e0,act}){
         s.jsxs("div",{className:"muted small",children:[ir[p.role].name," · ",p.idade," anos · ",mine?`contrato até T${p.contratoAte}`:p.teamId?`${tn(p.teamId)} · contrato até T${p.contratoAte}`:"sem equipe"]}),
         !mine&&s.jsxs("div",{className:"small",children:[ev.ex.ok?"✅ ":"❌ ",ev.ex.txt,ev.ex.det&&!ev.ex.ok?` (${ev.ex.det})`:""]})]}),
       s.jsxs("div",{style:{textAlign:"right"},children:[s.jsxs("div",{className:"num",children:[s.jsx("b",{children:p.habilidade}),!mine&&s.jsxs("span",{className:d>0?"gain":"loss",children:[" (",d>0?"+":"",d,")"]})]}),
-        mine&&!canRenew?s.jsx("span",{className:"muted small",children:J(p.salario)+"/GP"}):p.recusou===e.season?s.jsx("span",{className:"loss small",children:"Recusou"}):s.jsx("button",{onClick:()=>pick(p),style:{padding:"4px 10px",fontSize:".85rem"},children:open===p.id?"Fechar":canRenew?"Renovar":"Negociar"})]})]});
+        mine&&!canRenew?s.jsx("span",{className:"muted small",children:J(p.salario)+"/GP"}):p.recusou===e.season?s.jsx("span",{className:"loss small",children:"Encerrou"}):s.jsx("button",{onClick:()=>pick(p),className:p.contra&&p.contra.s===e.season?"primary":"",style:{padding:"4px 10px",fontSize:".85rem"},children:open===p.id?"Fechar":p.contra&&p.contra.s===e.season?"💬 Contraproposta":canRenew?"Renovar":"Negociar"})]})]});
     const form=open===p.id&&s.jsxs("div",{style:{marginTop:8,padding:10,border:"1px solid var(--line)",borderRadius:10,display:"grid",gap:8},children:[
       s.jsx("div",{className:"small muted",children:Pl[p.personalidade]?`${Pl[p.personalidade].name}: ${Pl[p.personalidade].desc}`:ir[p.role].effect}),
       s.jsxs("div",{className:"small",children:["Pede ",s.jsx("b",{children:J(ev.ask)+"/GP"}),mine?"":` (hoje ganha ${J(p.salario)})`]}),
@@ -636,12 +639,12 @@ function __StaffPanel({state:e0,act}){
       s.jsxs("div",{className:"small",children:[ev.ex.ok?"✅ ":"❌ ","Exigência: ",ev.ex.txt]}),
       s.jsxs("div",{className:"small",children:["Interesse: ",s.jsx("b",{className:ev.lab==='Alto'?"gain":ev.lab==='Baixo'?"loss":"",children:ev.lab}),ev.from?` · vem de uma equipe ${yr(ev.from)>yr(me)?"mais forte":"mais fraca"} que a sua`:""]}),
       s.jsxs("div",{className:"small muted",children:[mine?`Luvas da renovação ${J(c.luvas)}`:`Luvas ${J(c.luvas)}`,c.buy?` · multa rescisória à ${c.from.name} ${J(c.buy)}`:"",c.mult?` · dispensa de ${c.cur.name} ${J(c.mult)}`:""]}),
-      s.jsx("button",{className:"primary",onClick:()=>{act(A=>__sOffer(A,p.id,o.sal,anos));setOpen(null)},children:`Enviar proposta · ${J(c.total)}`})]});
+      (()=>{const ct=p.contra&&p.contra.s===e.season?p.contra:null;if(!ct)return null;const cc=__sCost(e,p,{sal:ct.sal,anos:ct.anos});return s.jsxs("div",{className:"small",style:{padding:8,borderRadius:8,background:"var(--panel-2)",display:"grid",gap:6},children:[s.jsxs("div",{children:["💬 Contraproposta: aceita ",s.jsx("b",{children:J(ct.sal)+"/GP"})," com contrato de ",ct.anos," temporada",ct.anos>1?"s":"","."]}),s.jsx("button",{onClick:()=>{act(A=>__sOffer(A,p.id,ct.sal,ct.anos));setOpen(null)},children:`Aceitar contraproposta · ${J(cc.total)}`})]})})(),s.jsx("div",{className:"small muted",children:`Tentativas restantes nesta temporada: ${p.tS===e.season?p.tN:3} de 3`}),s.jsx("button",{className:"primary",onClick:()=>{act(A=>__sOffer(A,p.id,o.sal,anos));setOpen(null)},children:`Enviar proposta · ${J(c.total)}`})]});
     return s.jsxs("div",{style:{padding:"10px 0",borderTop:"1px solid var(--line)"},children:[head,form]},p.id)});
   return s.jsxs("div",{className:"card",children:[s.jsx("h3",{children:"Mercado de profissionais"}),
-    s.jsx("p",{className:"muted small",children:"Estude o mercado: compare a habilidade com a do seu funcionário atual (número entre parênteses), veja a exigência de cada um e faça uma proposta. Tirar alguém de outra equipe custa a multa rescisória do contrato. Quem recusa não volta a negociar na mesma temporada."}),
+    s.jsx("p",{className:"muted small",children:"Estude o mercado: compare a habilidade com a do seu funcionário atual (número entre parênteses), veja a exigência de cada um e faça uma proposta. Tirar alguém de outra equipe custa a multa rescisória do contrato. Você tem 3 tentativas com cada um por temporada: se a oferta chegar perto, ele pode aceitar um meio-termo ou mandar uma contraproposta."}),
     s.jsxs("div",{className:"row",style:{gap:6,flexWrap:"wrap"},children:[chip(tab==='outras',"Outras equipes",()=>{setTab('outras');setOpen(null)}),chip(tab==='mercado',`Sem equipe (${e.staffMarket.length})`,()=>{setTab('mercado');setOpen(null)}),chip(tab==='minha',"Minha equipe",()=>{setTab('minha');setOpen(null)})]}),
-    s.jsxs("div",{className:"row",style:{gap:6,flexWrap:"wrap",marginTop:6},children:[...so.map(k=>chip(role===k,ir[k].name,()=>{setRole(k);setLim(8);setOpen(null)})),chip(role==='todos',"Todos",()=>{setRole('todos');setLim(8);setOpen(null)})]}),
+    tab==='outras'&&s.jsxs("label",{className:"field",style:{marginTop:8},children:[s.jsx("span",{children:"Equipe"}),s.jsxs("select",{value:tf,onChange:x=>{setTf(x.target.value);setLim(8);setOpen(null)},children:[...rivals.map(t=>s.jsx("option",{value:t.id,children:t.name},t.id)),s.jsx("option",{value:"todas",children:"Todas as equipes"},"todas")]})]}),s.jsxs("div",{className:"row",style:{gap:6,flexWrap:"wrap",marginTop:6},children:[...so.map(k=>chip(role===k,ir[k].name,()=>{setRole(k);setLim(8);setOpen(null)})),chip(role==='todos',"Todos",()=>{setRole('todos');setLim(8);setOpen(null)})]}),
     s.jsx("div",{style:{marginTop:8},children:body.length?body:s.jsx("p",{className:"muted small",children:"Ninguém disponível neste cargo agora."})}),more>0&&s.jsx("button",{className:"link",onClick:()=>setLim(lim+8),children:`Ver mais ${Math.min(8,more)} de ${more}`})]})}
 
 /* ── AI World Simulation ── */
