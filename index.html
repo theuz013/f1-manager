@@ -484,7 +484,7 @@ function __spy(e0,tid,p,L){let e=e0;const b=Ye(e);if(b)return b;const S=__SPY[L]
     const msg=`🚨 A federação pegou a ${me.name} espionando a ${t.name}: multa de R$ ${Bh(S.fine)} mi, reputação −${S.rep}${S.conf?`, diretoria −${S.conf}`:""}${L===2?" e o projeto confiscado (−0,5 nível)":""}.`;
     e=_c(e,ts(e,"paddock",[L===0?`📰 ${t.name} reclama de fotógrafos da ${me.name} no pit lane.`:`🚨 Escândalo: ${me.name} é punida por espionagem contra a ${t.name}.`]));e=rn(e,msg);return ie(e,msg)}
   if(gain>0)e={...e,rnd:{...e.rnd,designs:{...e.rnd.designs,[p]:Math.min(jh,G((e.rnd.designs[p]||0)+gain))}}};
-  const msg=gain>0?`🕵️ Operação "${S.name}" deu certo: o projeto de ${me_name(p)} avançou ${String(gain).replace(".",",")} nível. Fabrique a peça para levar ao carro.`:`🕵️ Operação "${S.name}" concluída sem ser descoberta, mas a ${me_name(p)} da ${t.name} não é melhor que o seu projeto. Nada a copiar.`;
+  const msg=gain>0?`🕵️ Operação "${S.name}" deu certo: o projeto de ${me_name(p)} avançou ${String(gain).replace(".",",")} nível. Fabrique a peça para levar ao carro.`:`🕵️ Operação "${S.name}" concluída sem ser descoberta, mas a peça da ${t.name} (${me_name(p)}) não é melhor que o seu projeto. Nada a copiar.`;
   return ie(rn(e,msg),msg)}
 function me_name(p){return(me[p]||p).toLowerCase()}
 function __SpyCard({e,act}){const tm=q(e),rivals=e.teams.filter(t=>t.id!==tm.id).sort((a,b)=>yr(b)-yr(a)),[tid,setT]=D.useState(rivals[0]&&rivals[0].id),[p,setP]=D.useState("motor"),[L,setL]=D.useState(0),[open,setOpen]=D.useState(false);
