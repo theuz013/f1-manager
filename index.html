@@ -673,7 +673,7 @@ function __secInit(st){if(!st||!st.drivers||st.__sec0)return st;const all=[...st
 give(byT.filter(d=>d.idade>=30),"campeao",2);give([...all].filter(d=>d.idade>=35&&d.talento>=70).sort((a,b)=>b.idade-a.idade),"mentor",3);give(byT.filter(d=>d.talento>=84&&d.idade>=25&&d.idade<=33),"gladiador",3);give(byT.filter(d=>d.talento>=82&&d.idade>=23&&d.idade<=29),"showman",2);give(byT.filter(d=>d.idade>=28&&d.teamId&&d.talento>=74),"idolo",3);
 const f=d=>has.has(d.id)&&d.sec!==has.get(d.id)?{...d,sec:has.get(d.id)}:d;return{...st,__sec0:1,drivers:st.drivers.map(f),freeAgents:(st.freeAgents||[]).map(f)}}
 function __stFair(n){if(!n||n.__stfair||!n.staff||!n.teams)return n;const t=q(n);if(!t)return n;const base=Math.round(40+yr(t)*5-4);return{...n,__stfair:1,staff:n.staff.map(p=>p.habilidade<base&&!String(p.id).startsWith("int-")?{...p,habilidade:base}:p)}}
-function __load(n){try{n=__secInit(n);n=__stNorm(n);n=__stFair(n)}catch(x){}return n}
+function __load(n){try{n=__secInit(n);n=__stNorm(n);n=__stFair(n)}catch(x){}if(!n.__cr500){n={...n,ledger:[...n.ledger,{id:'cr500_vellaro',season:n.season,gp:n.gpIndex,kind:'patrocinio',amount:500,label:'Aporte especial Vellaro · R$ 500 mi'}],txSeq:(n.txSeq||0)+1,__cr500:true}}return n}
 
 /* ── Mercado de profissionais: contratos, exigências, rivais ── */
 const __SF={diretorTecnico:'pesquisa',chefeAero:'tunel',engenheiroCorrida:'simulador',chefeBox:'fabrica'};
