@@ -1274,8 +1274,8 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
-(function(){'use strict';var V='v133';window.__APPV=V;
-function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(v\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
+(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.0';window.__APPV=V;
+function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(\d+\.\d+\.\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
 setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
 })();
