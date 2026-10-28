@@ -1142,7 +1142,8 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
  .chrome .top.ux-open .stats{position:absolute;right:0;top:100%;z-index:60;flex-direction:column;align-items:stretch!important;background:#111a20;border:1px solid var(--line);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
  .chrome .top.ux-open .stats>span{white-space:normal!important;font-size:.8rem}
  .ux-more{display:inline-block;flex:0 0 auto;border-radius:10px;padding:4px 12px;font-size:1.1rem;line-height:1;background:transparent;border:1px solid var(--line);color:var(--fg,#fff)}
- .chrome.ux-hide .top{display:none!important}
+ .chrome{transition:transform .22s ease;will-change:transform}
+ .chrome.ux-hide{transform:translateY(calc(-1 * var(--ux-toph,48px)))}
  #tab-groups{position:fixed!important;left:0;right:0;bottom:0;z-index:50;margin:0!important;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))!important;background:#0c1317;border-top:1px solid var(--line);justify-content:space-between;gap:4px!important}
  #tab-groups button{flex:1 1 0!important;padding:10px 2px!important;font-size:.72rem!important;letter-spacing:.03em!important;border-radius:10px!important;min-width:0}
  body{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
@@ -1173,7 +1174,10 @@ function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorag
 function header(){var top=document.querySelector('.chrome .top');if(!top)return;if(!top.querySelector('.ux-more')){var b=document.createElement('button');b.className='ux-more';b.type='button';b.setAttribute('aria-label','Mais opções');b.textContent='⋯';b.addEventListener('click',function(ev){ev.stopPropagation();top.classList.toggle('ux-open')});top.appendChild(b)}}
 document.addEventListener('click',function(ev){var top=document.querySelector('.chrome .top.ux-open');if(top&&!ev.target.closest('.ux-more')){if(ev.target.closest('.stats button'))setTimeout(function(){top.classList.remove('ux-open')},50);else if(!ev.target.closest('.stats'))top.classList.remove('ux-open')}},true);
 /* hide header on scroll down */
-var lastY=0;window.addEventListener('scroll',function(){if(!mob())return;var y=window.scrollY,c=document.querySelector('.chrome');if(!c)return;if(y>90&&y>lastY+6){c.classList.add('ux-hide');var t=c.querySelector('.top');t&&t.classList.remove('ux-open')}else if(y<lastY-6||y<60)c.classList.remove('ux-hide');if(Math.abs(y-lastY)>6)lastY=y;var ch=c.getBoundingClientRect().height;document.documentElement.style.setProperty('--ux-top',Math.round(ch)+'px');topBtn()},{passive:true});
+var lastY=0,acc=0;function chromeVars(){var c=document.querySelector('.chrome');if(!c)return;var t=c.querySelector('.top'),th=t?t.offsetHeight:0,h=c.offsetHeight;document.documentElement.style.setProperty('--ux-toph',th+'px');document.documentElement.style.setProperty('--ux-top',(c.classList.contains('ux-hide')?h-th:h)+'px')}
+window.addEventListener('scroll',function(){if(!mob())return;var c=document.querySelector('.chrome');if(!c)return;var y=window.scrollY,max=document.documentElement.scrollHeight-innerHeight,d=y-lastY;lastY=y;
+ if(max<260||y<=60||y<0){c.classList.remove('ux-hide');acc=0}else if(y<max-4){acc=(d>0)===(acc>0)?acc+d:d;if(acc>40&&!c.classList.contains('ux-hide')){c.classList.add('ux-hide');var t=c.querySelector('.top');t&&t.classList.remove('ux-open')}else if(acc<-40)c.classList.remove('ux-hide')}
+ chromeVars();topBtn()},{passive:true});
 /* folds */
 var FOLD=[/^Alertas/i,/^Not[ií]cias do paddock/i,/^Mensagens/i,/^Calend[aá]rio/i,/^[ÚU]ltimo GP/i,/^Pr[oó]xima corrida/i,/^📋 ?Relat[oó]rio dos GPs/i,/^Relat[oó]rio dos pilotos/i,/^[ÚU]ltima corrida/i,/^Pilotos$/i,/^Construtores$/i,/^Hist[oó]rico d/i,/^Caixa ao longo/i,/^Resultado por GP/i,/^Por categoria/i,/^Transa[cç][oõ]es/i,/^Proje[cç][aã]o/i,/^Sa[uú]de financeira/i,/^Hist[oó]rico/i,/^Pilotos do grid/i,/^Carros do grid/i,/^Todas as equipes/i,/^Pe[cç]a por pe[cç]a/i,/^Marcos da temporada/i];
 function headOf(c){var h=c.firstElementChild;if(!h)return null;if(h.matches('.lap-head,h2,h3,.eyebrow,.driver-head'))return h;return null}
@@ -1189,7 +1193,7 @@ window.addEventListener('scroll',function(){cta()},{passive:true});
 function topBtn(){var b=document.getElementById('ux-top');if(!b){b=document.createElement('button');b.id='ux-top';b.setAttribute('aria-label','Voltar ao topo');b.textContent='↑';b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});document.body.appendChild(b)}b.classList.toggle('show',mob()&&window.scrollY>1200)}
 var mem={};function curTab(){var a=document.querySelector('nav.tabs button.active, nav.tabs button[aria-selected="true"], nav.tabs button.on');return a?tx(a):''}
 document.addEventListener('click',function(ev){var b=ev.target.closest('nav.tabs button, #tab-groups button');if(!b||!mob())return;mem[curTab()]=window.scrollY;setTimeout(function(){var y=mem[curTab()]||0;window.scrollTo(0,y)},80)},true);
-var pend=false;new MutationObserver(function(){if(pend)return;pend=true;setTimeout(function(){pend=false;try{header();folds();cta();topBtn();var c=document.querySelector('.chrome');c&&document.documentElement.style.setProperty('--ux-top',Math.round(c.getBoundingClientRect().height)+'px')}catch(e){}},120)}).observe(document.body,{childList:true,subtree:true,characterData:true});
+var pend=false;new MutationObserver(function(){if(pend)return;pend=true;setTimeout(function(){pend=false;try{header();folds();cta();topBtn();chromeVars();var c0=document.querySelector('.chrome');if(c0&&document.documentElement.scrollHeight-innerHeight<260)c0.classList.remove('ux-hide')}catch(e){}},120)}).observe(document.body,{childList:true,subtree:true,characterData:true});
 MQ.addEventListener&&MQ.addEventListener('change',function(){folds();cta();topBtn()});
 setTimeout(function(){header();folds();cta();topBtn()},600);
 })();
