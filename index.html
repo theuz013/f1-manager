@@ -1142,8 +1142,8 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
  .chrome .top.ux-open .stats{position:absolute;right:0;top:100%;z-index:60;flex-direction:column;align-items:stretch!important;background:#111a20;border:1px solid var(--line);border-radius:12px;padding:10px;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
  .chrome .top.ux-open .stats>span{white-space:normal!important;font-size:.8rem}
  .ux-more{display:inline-block;flex:0 0 auto;border-radius:10px;padding:4px 12px;font-size:1.1rem;line-height:1;background:transparent;border:1px solid var(--line);color:var(--fg,#fff)}
- .chrome{transition:transform .22s ease;will-change:transform}
- .chrome.ux-hide{transform:translateY(calc(-1 * var(--ux-toph,48px)))}
+ .chrome{transform:none!important}
+ html,body{overscroll-behavior-y:none}
  #tab-groups{position:fixed!important;left:0;right:0;bottom:0;z-index:50;margin:0!important;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))!important;background:#0c1317;border-top:1px solid var(--line);justify-content:space-between;gap:4px!important}
  #tab-groups button{flex:1 1 0!important;padding:10px 2px!important;font-size:.72rem!important;letter-spacing:.03em!important;border-radius:10px!important;min-width:0}
  body{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
@@ -1165,6 +1165,13 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
+(function(){'use strict';var V='v104';window.__APPV=V;
+function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(v\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
+setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
+var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
+})();
+</script>
+<script>
 (function(){'use strict';
 var MQ=window.matchMedia('(max-width:700px)');
 function mob(){return MQ.matches}
@@ -1176,7 +1183,7 @@ document.addEventListener('click',function(ev){var top=document.querySelector('.
 /* hide header on scroll down */
 var lastY=0,acc=0;function chromeVars(){var c=document.querySelector('.chrome');if(!c)return;var t=c.querySelector('.top'),th=t?t.offsetHeight:0,h=c.offsetHeight;document.documentElement.style.setProperty('--ux-toph',th+'px');document.documentElement.style.setProperty('--ux-top',(c.classList.contains('ux-hide')?h-th:h)+'px')}
 window.addEventListener('scroll',function(){if(!mob())return;var c=document.querySelector('.chrome');if(!c)return;var y=window.scrollY,max=document.documentElement.scrollHeight-innerHeight,d=y-lastY;lastY=y;
- if(max<260||y<=60||y<0){c.classList.remove('ux-hide');acc=0}else if(y<max-4){acc=(d>0)===(acc>0)?acc+d:d;if(acc>40&&!c.classList.contains('ux-hide')){c.classList.add('ux-hide');var t=c.querySelector('.top');t&&t.classList.remove('ux-open')}else if(acc<-40)c.classList.remove('ux-hide')}
+ c.classList.remove('ux-hide');if(Math.abs(d)>4){var t=c.querySelector('.top');t&&t.classList.remove('ux-open')}
  chromeVars();topBtn()},{passive:true});
 /* folds */
 var FOLD=[/^Alertas/i,/^Not[ií]cias do paddock/i,/^Mensagens/i,/^Calend[aá]rio/i,/^[ÚU]ltimo GP/i,/^Pr[oó]xima corrida/i,/^📋 ?Relat[oó]rio dos GPs/i,/^Relat[oó]rio dos pilotos/i,/^[ÚU]ltima corrida/i,/^Pilotos$/i,/^Construtores$/i,/^Hist[oó]rico d/i,/^Caixa ao longo/i,/^Resultado por GP/i,/^Por categoria/i,/^Transa[cç][oõ]es/i,/^Proje[cç][aã]o/i,/^Sa[uú]de financeira/i,/^Hist[oó]rico/i,/^Pilotos do grid/i,/^Carros do grid/i,/^Todas as equipes/i,/^Pe[cç]a por pe[cç]a/i,/^Marcos da temporada/i];
