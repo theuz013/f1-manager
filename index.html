@@ -826,7 +826,7 @@ function __StaffPanel({state:e0,act}){
       s.jsxs("div",{style:{minWidth:0},children:[s.jsxs("div",{children:[s.jsx("b",{children:p.name})," ",s.jsx(po,{staff:p.personalidade}),__isInt(p)&&s.jsx("span",{className:"muted small",children:" · interino"})]}),
         s.jsxs("div",{className:"muted small",children:[ir[p.role].name," · ",p.idade," anos · ",mine?`contrato até T${p.contratoAte}`:p.teamId?`${tn(p.teamId)} · contrato até T${p.contratoAte}`:"sem equipe"]}),
         !mine&&s.jsxs("div",{className:"small",children:[ev.ex.ok?"✅ ":"❌ ",ev.ex.txt,ev.ex.det&&!ev.ex.ok?` (${ev.ex.det})`:""]})]}),
-      s.jsxs("div",{style:{textAlign:"right"},children:[s.jsxs("div",{className:"num",children:[s.jsx("b",{children:__int(p.habilidade)}),!mine&&s.jsxs("span",{className:d>0?"gain":"loss",children:[" (",d>0?"+":"",d,")"]})]}),
+      s.jsxs("div",{style:{textAlign:"right"},children:[s.jsxs("div",{className:"num",children:[s.jsx("b",{children:__int(p.habilidade)}),!mine&&s.jsxs("span",{className:Math.round(d)>0?"gain":Math.round(d)<0?"loss":"muted",children:[" (",Math.round(d)>0?"+":"",Math.round(d),")"]})]}),
         mine&&!canRenew?s.jsx("span",{className:"muted small",children:J(p.salario)+"/GP"}):p.recusou===e.season?s.jsx("span",{className:"loss small",children:"Encerrou"}):s.jsx("button",{onClick:()=>pick(p),className:p.contra&&p.contra.s===e.season?"primary":"",style:{padding:"4px 10px",fontSize:".85rem"},children:open===p.id?"Fechar":p.contra&&p.contra.s===e.season?"💬 Contraproposta":canRenew?"Renovar":"Negociar"})]})]});
     const form=open===p.id&&s.jsxs("div",{style:{marginTop:8,padding:10,border:"1px solid var(--line)",borderRadius:10,display:"grid",gap:8},children:[
       s.jsx("div",{className:"small muted",children:Pl[p.personalidade]?`${Pl[p.personalidade].name}: ${Pl[p.personalidade].desc}`:ir[p.role].effect}),
@@ -1656,7 +1656,7 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
-(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.33';window.__APPV=V;
+(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.34';window.__APPV=V;
 function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(\d+\.\d+\.\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
 setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
