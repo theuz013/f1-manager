@@ -1698,7 +1698,7 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 .cfg-btn{white-space:nowrap}
 .chrome .top:not(.ux-open) .stats>.cfg-btn{display:none!important}
 .chrome .top.ux-open .stats>.cfg-btn{width:100%;text-align:left;padding:10px 12px}
-@media(min-width:701px){.chrome .top .stats>.cfg-btn{display:inline-flex!important}}
+@media(min-width:701px){.chrome .top:not(.ux-open) .stats>.cfg-btn,.chrome .top.ux-open .stats>.cfg-btn{display:inline-flex!important;width:auto;padding:6px 12px}}
 .form{display:flex;gap:4px}.form .fp,.form>*{min-width:30px;text-align:center;box-sizing:border-box}
 </style>
 <style id="ux-101">
@@ -1783,7 +1783,7 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
-(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.59';window.__APPV=V;
+(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.60';window.__APPV=V;
 function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(\d+\.\d+\.\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
 setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
