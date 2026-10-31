@@ -760,8 +760,8 @@ function __sOffer(st0,pid,sal,anos){
       if(ev.ex.ok&&ev.sc>=34){const need=Ke(o.sal+(50-ev.sc)/150*ev.ask+.01);np.contra={s:e.season,sal:need,anos};msg+=` Contraproposta dele: ${J(need)}/GP.`}}
     e=__sUpd(e,loc,np);return ie(e,msg)}
   const c=__sCost(e,p,o);
-  if(loc.where==='mine'){const r=jn(e,'contratacao',c.luvas,`Renovação de ${p.name}`);if(!r.ok)return r;e=r.state;const ate=e.season+anos;
-    e={...e,staff:e.staff.map(x=>x.id===p.id?{...x,salario:o.sal,contratoAte:ate,recusou:undefined,tS:undefined,tN:undefined,contra:undefined}:x)};return ie(e,`${meio?"Meio-termo aceito! ":""}${p.name} renovou até a temporada ${ate}.`)}
+  if(loc.where==='mine'){const r=jn(e,'contratacao',c.luvas,`Renovação de ${p.name}`);let cred=!1;if(!r.ok){if(/Teto de gastos/.test(r.error||''))return r;e=He(e,'contratacao',-c.luvas,`Renovação de ${p.name} (luvas a pagar)`);e={...e,board:{...e.board,confidence:ee(e.board.confidence-1,0,100)}};cred=!0}else e=r.state;const ate=e.season+anos;
+    e={...e,staff:e.staff.map(x=>x.id===p.id?{...x,salario:o.sal,contratoAte:ate,recusou:undefined,tS:undefined,tN:undefined,contra:undefined}:x)};return ie(e,`${meio?"Meio-termo aceito! ":""}${p.name} renovou até a temporada ${ate}.${cred?` Sem caixa, as luvas (${J(c.luvas)}) entraram como dívida.`:""}`)}
   if(c.total>qe(e)+1e-9)return F(`Saldo insuficiente: a operação custa ${J(c.total)} e o caixa tem ${J(qe(e))}.`);
   let r=jn(e,'contratacao',c.luvas,`Luvas de ${p.name} (${ir[p.role].name})`);if(!r.ok)return r;e=r.state;
   if(c.buy){r=jn(e,'rescisao',c.buy,`Multa rescisória paga à ${c.from.name}`);if(!r.ok)return r;e=r.state}
@@ -1668,7 +1668,7 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
-(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.46';window.__APPV=V;
+(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.0.47';window.__APPV=V;
 function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(\d+\.\d+\.\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
 setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
