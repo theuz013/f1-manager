@@ -1041,11 +1041,11 @@ function __aiWorld(st){
    for(const B of buyers){if(moves>=5)break;
      const bD=B.driverIds.map(id=>drivers.find(d=>d.id===id)).filter(Boolean);if(bD.length<2)continue;
      const weak=[...bD].sort((a,b)=>a.talento-b.talento)[0];if(done.has(weak.id))continue;
-     const cands=drivers.filter(d=>d.teamId&&d.teamId!==B.id&&d.teamId!==meId&&!pre.has(d.id)&&!done.has(d.id)&&d.idade<=34&&d.talento>=weak.talento+5).map(d=>({d,T:teams.find(t=>t.id===d.teamId)})).filter(x=>x.T&&!x.T.isPlayer&&yr(x.T)<yr(B)-.5).sort((a,b)=>b.d.talento-a.d.talento);
+     const cands=drivers.filter(d=>d.teamId&&d.teamId!==B.id&&d.teamId!==meId&&!d.aiRes&&!d.loan&&teams.some(t=>t.id===d.teamId&&t.driverIds.includes(d.id))&&!pre.has(d.id)&&!done.has(d.id)&&d.idade<=34&&d.talento>=weak.talento+5).map(d=>({d,T:teams.find(t=>t.id===d.teamId)})).filter(x=>x.T&&!x.T.isPlayer&&yr(x.T)<yr(B)-.5).sort((a,b)=>b.d.talento-a.d.talento);
      const hasStar=bD.some(d=>d.talento>=90),c=cands.find(x=>!(hasStar&&x.d.talento>=88));if(!c)continue;
      const last=c.d.contratoAte<=S,pers=c.d.personalidade,idol=c.d.sec==="idolo",pr=last?(idol?.4:.85):idol?.05:pers==="ambicioso"?.5:pers==="leal"?.08:.28;
      if(!rng.chance(pr))continue;
-     const star={...c.d,teamId:B.id,salario:Es(c.d.talento),contratoAte:S+rng.int(1,2),moral:Math.max(c.d.moral,72)};
+     const star={...c.d,aiRes:void 0,aiProsp:void 0,resSince:void 0,teamId:B.id,salario:Es(c.d.talento),contratoAte:S+rng.int(1,2),moral:Math.max(c.d.moral,72)};
      const back={...weak,teamId:c.T.id,salario:Es(weak.talento),contratoAte:S+1,moral:Math.max(30,weak.moral-5)};
      drivers=drivers.map(d=>d.id===star.id?star:d.id===back.id?back:d);
      teams=teams.map(t=>t.id===B.id?{...t,driverIds:t.driverIds.map(id=>id===weak.id?star.id:id)}:t.id===c.T.id?{...t,driverIds:t.driverIds.map(id=>id===star.id?back.id:id)}:t);
@@ -1835,7 +1835,7 @@ kp(document.getElementById("root")).render(s.jsx(D.StrictMode,{children:s.jsx(__
 }
 </style>
 <script>
-(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.2.1';window.__APPV=V;
+(function(){'use strict';/* compat aparelhos antigos: var V='v134' */var V='1.2.2';window.__APPV=V;
 function chk(){try{fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){var m=t.match(/window\.__APPV=V;/)&&t.match(/var V='(\d+\.\d+\.\d+)'/);if(m&&m[1]!==V&&!document.getElementById('ux-upd')){var b=document.createElement('button');b.id='ux-upd';b.className='primary';b.textContent='Nova versão disponível ('+m[1]+'). Toque para atualizar';b.style.cssText='position:fixed;left:12px;right:12px;top:calc(8px + env(safe-area-inset-top,0px));z-index:9999;padding:12px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.5)';b.onclick=function(){location.replace(location.pathname+'?v='+Date.now())};document.body.appendChild(b)}}).catch(function(){})}catch(e){}}
 setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 var vs=setInterval(function(){var st=document.querySelector('.chrome .top .stats');if(st&&!st.querySelector('.ux-ver')){var sp=document.createElement('span');sp.className='ux-ver';sp.textContent='Versão '+V;sp.style.cssText='font-size:.7rem;opacity:.6';st.appendChild(sp)}},1500);
